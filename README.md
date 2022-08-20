@@ -1,1 +1,1 @@
-Fall 22 Launchpad Project: MathWiz
+Fall 22 Launchpad Project: GeoKnowr
