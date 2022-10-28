@@ -133,29 +133,34 @@ class Resnet(object):
         
     def build_net(self, images, labels, is_training):
         with tf.variable_scope('block0') as scope:
-            x = ______
+            x = conv(images, 7, 64, 2, name='conv1', use_bias = not self.use_batchnorm)
             if self.use_batchnorm:
-                x = ______
-            x = ______
-            x = ______
+                x = bn(x, is_training)
+            x = relu(x)
+            x = maxpool(x, 3, 2)
 
         blockno = 1
         for size, filters, stride in zip(self.block_sizes, self.block_filters,
                                          self.block_strides):
+            print('Making basic block {}'.format(blockno))
             with tf.variable_scope('block{}'.format(blockno)) as scope:
                 for i in range(size):
-                    x = ______
+                    x = self.block(x, filters, stride if i == 0 else 1,
+                                   is_training, name='block{}'.format(i+1),
+                                   use_batchnorm = self.use_batchnorm,
+                                   use_bias = not self.use_batchnorm)
                 blockno = blockno + 1
 
         with tf.variable_scope('output'):
-            x = ______
-            x = ______
+            x = tf.reduce_mean(x, axis = [1,2])
+            x = fc(x, self.opt.num_classes)
 
-        preds = ______
+        preds = tf.nn.softmax(x)
 
-        wd_loss = ______
-        loss = ______
-        return ______
+        wd_loss = tf.add_n([ tf.nn.l2_loss(v) for v in tf.trainable_variables()
+                             if 'kernel'])*0.0001
+        loss = tf.reduce_mean(tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=x))
+        return preds, loss + wd_loss
 
 # Implementation of the three variants of ResNet that integrat information from other views
 
