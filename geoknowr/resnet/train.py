@@ -165,20 +165,20 @@ print(opt.num_classes)
 
 
 
-config = tf.ConfigProto()
+config = tf.compat.v1.ConfigProto()
 config.gpu_options.per_process_gpu_memory_fraction = 1.0
 config.gpu_options.allow_growth = True
-with tf.Graph().as_default(), tf.Session(config=config) as sess:
+with tf.Graph().as_default(), tf.compat.v1.Session(config=config) as sess:
 
     # Make dataset and graph
-    is_training = tf.placeholder(tf.bool, name='is_training')
+    is_training = tf.compat.v1.placeholder(tf.bool, name='is_training')
 
     train_data = data.grouped_streetview_dataset(train_files, train_labels, opt.batch_size,
                                                  augment = True, shuffle = True)
     val_data = data.grouped_streetview_dataset(val_files, val_labels, opt.batch_size,
                                                augment = False, shuffle = False)
 
-    it = tf.data.Iterator.from_structure(train_data.output_types, train_data.output_shapes)
+    it = tf.compat.v1.data.Iterator.from_structure(tf.compat.v1.data.get_output_types(train_data), tf.compat.v1.data.get_output_shapes(train_data))
     filenames_op, rgb, images, labels = it.get_next()
     train_init_op = it.make_initializer(train_data)
     val_init_op = it.make_initializer(val_data)    

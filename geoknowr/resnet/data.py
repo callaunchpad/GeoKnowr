@@ -84,7 +84,7 @@ def train_val_split(files, labels):
 # Tensorflow functions for mapping a dataset of filenames to the actual images they reference
 
 def parse_image(filename):
-    filecontents = tf.read_file(filename)
+    filecontents = tf.io.read_file(filename)
     jpeg = tf.image.decode_jpeg(filecontents)
     jpeg.set_shape([256, 256, 3])
     return jpeg
@@ -106,14 +106,14 @@ def _lighting_noise(img, alphastd):
                           [-0.5808,-0.0045,-0.8140 ],
                           [-0.5836,-0.6948,0.4203]])
     eigval = tf.constant([ 0.2175, 0.0188, 0.0045 ])
-    alpha = tf.random_normal((), mean=0, stddev=alphastd)
+    alpha = tf.random.normal((), mean=0, stddev=alphastd)
     imgnoise = tf.reshape(tf.reduce_sum(eigvec*eigval*alpha, 1), [1, 1, 3])
     return img + imgnoise
 
 
 def grouped_streetview_dataset(files, labels, batch_size, augment = True, shuffle = True):
     def augment_image(img):
-        flip = tf.greater(tf.random_uniform((), 0, 1), 0.5)
+        flip = tf.greater(tf.random.uniform((), 0, 1), 0.5)
 
         img = tf.cond(flip, lambda: img, lambda: img[:,::-1,:])
         img = _color_jitter(img, 0.4, 0.4, 0.4)
