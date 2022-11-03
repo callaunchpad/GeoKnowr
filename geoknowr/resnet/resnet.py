@@ -6,10 +6,10 @@ import numpy as np
 def fc(x, out_dim, name='fc'):
     in_shape = x.get_shape()
     with tf.compat.v1.variable_scope(name):
-        w = tf.get_variable('weights', [x.get_shape()[1], out_dim],
+        w = tf.compat.v1.get_variable('weights', [x.get_shape()[1], out_dim],
                             tf.float32, initializer=tf.random_normal_initializer(
                                 stddev=np.sqrt(1.0/out_dim)))
-        b = tf.get_variable('biases', [out_dim], tf.float32,
+        b = tf.compat.v1.get_variable('biases', [out_dim], tf.float32,
                             initializer=tf.constant_initializer(0.0))
     fc = tf.nn.bias_add(tf.matmul(x, w), b)
     return fc
@@ -27,15 +27,18 @@ def bn(x, is_training, name='bn'):
                                              training = is_training)
 
 def conv(x, kern_sz, out_filters, stride = 1, name='conv', use_bias = False):
+    # print(x)
+    # print(out_filters)
     in_filters = x.get_shape().as_list()[-1]
+    # in_filters = x[-1].get_shape().as_list()[-1]
     sigsq = 2.0/(kern_sz*kern_sz*out_filters)
     with tf.compat.v1.variable_scope(name):
-        kernel = tf.get_variable('kernel', [kern_sz, kern_sz, in_filters, out_filters],
+        kernel = tf.compat.v1.get_variable('kernel', [kern_sz, kern_sz, in_filters, out_filters],
                                  tf.float32, initializer =
                                  tf.random_normal_initializer(stddev = np.sqrt(sigsq)))
         print(kern_sz*kern_sz*in_filters*out_filters + out_filters)
         if use_bias:
-            bias = tf.get_variable('bias',
+            bias = tf.compat.v1.get_variable('bias',
                                    [1, 1, 1, out_filters],
                                    dtype = tf.float32,
                                    initializer = tf.zeros_initializer())
